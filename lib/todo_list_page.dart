@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:lista_tarefas_app/models/todo.dart';
+import 'package:lista_tarefas_app/repositories/todo_repo.dart';
 import 'package:lista_tarefas_app/widgets/todo_list_item.dart';
 
 class TodoListPage extends StatefulWidget {
@@ -13,11 +14,23 @@ class TodoListPage extends StatefulWidget {
 
 class _TodoListPageState extends State<TodoListPage> {
   final TextEditingController todoController = TextEditingController();
+  final TodoRepo todoRepo = TodoRepo();
 
   List<Todo> todos = [];
 
   Todo? deletedTodo;
   int? deletedTodoPos;
+
+  @override
+  void initState(){
+    super.initState();
+
+    todoRepo.getTodoList().then((value){
+      setState(() {
+        todos = value;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +39,7 @@ class _TodoListPageState extends State<TodoListPage> {
         appBar: AppBar(
           // ignore: prefer_const_literals_to_create_immutables
           title: Text('To Do List'),
-          backgroundColor: Colors.cyan,
+          backgroundColor: Colors.green,
         ),
         body: Center(
           child: Padding(
@@ -58,9 +71,10 @@ class _TodoListPageState extends State<TodoListPage> {
                           todos.add(newTodo);
                         });
                         todoController.clear();
+                        todoRepo.saveTodoList(todos);
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.cyan,
+                        primary: Colors.green,
                         padding: const EdgeInsets.all(22),
                       ),
                       child: Icon(
@@ -95,7 +109,7 @@ class _TodoListPageState extends State<TodoListPage> {
                       onPressed: showDeleteTodosConfirmationDialog,
                       child: Text('Limpar tudo'),
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.cyan,
+                        primary: Colors.green,
                       ),
                     ),
                   ],
@@ -125,7 +139,7 @@ class _TodoListPageState extends State<TodoListPage> {
         backgroundColor: Colors.black54,
         action: SnackBarAction(
           label: 'Desfazer',
-          textColor: Colors.cyan,
+          textColor: Colors.green,
           onPressed: () {
             setState(() {
               todos.insert(deletedTodoPos!, deletedTodo!);
